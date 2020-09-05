@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级成员展示</title>
+    <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <style>
+        #classCount{
+            font-size: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+    <section id="root">
+        <!-- 子组件，展示班级暂时的总人数 -->
+        <Totalnum :count='num'></Totalnum>
+        <!-- 子组件 -->
+        <!-- 绑定自定义属性，来接受父组件传递的值 -->
+        <Classnum :names='namelist'></Classnum>
+    </section>
+    <script type="text/x-template" id="show">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row">
+                <div class="col-sm-4" v-for='(item,index) in names' :key='index' >
+                    <div class="contact-box">
+                        <a href="profile.html">
+                            <div class="col-sm-4">
+                                <div class="text-center">
+                                    <!-- 头像 -->
+                                    <img alt="image" class="img-circle m-t-xs img-responsive" :src="item.pic">
+                                    <div class="m-t-xs font-bold">CEO</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <!-- 姓名 -->
+                                <h3><strong>{{ item.name }}</strong></h3>
+                                <p><i class="fa fa-map-marker"></i> 甘肃·兰州</p>
+                                <address>
+                                <strong>{{ item.sex }}</strong><br>
+                                E-mail:xxx@baidu.com<br>
+                                <!-- 手机号 -->
+                                Weibo:<a href="JavaScript:;">{{ item.phone }}</a><br>
+                                <abbr title="Phone">Tel:</abbr> (123) 456-7890
+                            </address>
+                            </div>
+                            <div class="clearfix"></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script src="../lib/axios.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script>
+        const Totalnum={
+            template:`<p id='classCount' >班级数据库跟新至{{ count }}人<p>`,
+            props:['count']
+
+        }
+        const Classnum = {
+            props:['names'],
+            template:"#show",
+        }
+        new Vue({
+            el:'#root',
+            data:{
+                namelist:[],
+                num:0,
+            },
+            components:{ Classnum , Totalnum },
+            mounted(){
+                const url = 'http://127.0.0.1:8080/a'
+                axios.get(url,{
+                    name:'zhangsan',
+                    pwd:'45678'
+                }).then(res =>{
+                   console.log( res )
+                   this.namelist = res
+                   this.num = res.length
+                })
+            }
+        })
+
+    </script>
+</body>
+
+</html>

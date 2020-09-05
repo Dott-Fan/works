@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoList</title>
+    <style>
+        html,body,h1,input,ol,ul,li,p{
+            margin: 0;
+            padding: 0;
+        }
+        ol,ul,li{
+            list-style-type: none;
+            
+        }
+        body{
+            background: #cdcdcd;
+        }
+        #topArea{
+            background: #000;
+        }
+        header,.main-con{
+            margin: 0 auto;
+            width: 600px;
+        }
+        header{
+            font-size: 20px;
+            height: 40px;
+            line-height: 40px;
+            color: #ffffff;
+            display: flex;
+            align-items:center;
+            justify-content: space-between;
+        }
+        header input{
+            height: 30px;
+            width:360px;
+            line-height: 40px;
+            outline: none;
+            border-radius: 8px;
+            padding-left: 10px;
+        }
+        li{
+            background:skyblue; 
+            position: relative;
+            margin-top:4px;
+        }
+        li p{
+            height: 30px;
+            line-height: 30px;
+            background: #fff;
+            margin-left: 4px;
+            padding-left: 8px;
+            padding-right: 90px;
+            /* float: left; */
+        }
+        .doing ol li button:nth-of-type(1){
+            position: absolute;
+            right:50px;
+            top: 5px;
+        }
+        .doing ol li button:nth-of-type(2){
+            position: absolute;
+            right:0px;
+            top: 5px;
+        }
+        .finished ul li button{
+            position: absolute;
+            right:0px;
+            top: 5px;
+        }
+        .doing>h2,.finished>h2{
+            position: relative;
+        }
+        #doing_num,#end_num{
+            position: absolute;
+            width: 20px ;
+            height: 20px;
+            border-radius: 8px;
+            background: #fff;
+            right: 0px;
+            top: 6px;
+            font-size: 16px;
+            line-height: 20px;
+            text-align: center;
+        }
+        /* .clear_fix:after{
+            content: '';
+            clear: both;
+            height: 0;
+            display: none;
+            visibility: hidden;
+            overflow:hidden;
+        } */
+
+    </style>
+</head>
+<body>
+    <section id="root">
+        <section id="topArea">
+            <Top></Top>
+        </section>
+        <section id="main">
+            <section class="main-con">
+                <!-- 正在进行是一个组件 -->
+                <Doing></Doing>
+                <!-- 已经完成时一个组件 -->
+                <Ended></Ended>
+            </section>
+        </section>
+        <!-- <a href="http://www.baidu.com">百度一下</a> -->
+    </section>
+
+    <script type="text/x-template" id="top">
+        <header>
+            <h1 id="logo">ToDoList</h1>
+            <!-- input框是一个组件 -->
+            <input type="text" placeholder="添加todolist" v-model = 'thing' @keyup.enter='add'>
+        </header>
+    </script>
+
+
+    <script type="text/x-template" id="doing">
+        <div class ='doing'>
+            <h2>
+                正在进行
+                <DoingCount :num1 ='num' ></DoingCount>
+            </h2>
+            <ol>
+                <li v-for='(item,index) in willDo' :key='index'>
+                    <p>{{ item }}</p>
+                    <button @click = 'remove(index)'>完成</button>
+                    <button @click='del(index)'>删除</button>
+                </li>
+            </ol>
+        </div>
+    </script>
+    <script type="text/x-template" id="ended">
+        <div class='finished'>
+            <h2>
+                已经完成
+                <EndCount :num2='num'></EndCount>
+            </h2>
+            <ul>
+                <li v-for='(item,index) in doneList' :key='index'>
+                    <p>{{ item }}</p>
+                    <button @click='del(index)'>删除</button>
+                </li>
+            </ul>
+            
+        </div>
+    </script>
+    
+    <script src="../lib/vue.js"></script>
+    <script>
+        // 通信使用事件总线
+        const bus = new Vue();
+
+        // input框的组件，也就是头部组件
+        const Top = {
+            template:"#top",
+            data(){
+                return{thing:''}
+            },
+            methods:{
+                add(){
+                    // this.thing
+                    //console.log(this.thing)
+                    console.log(this.thing.length)
+                    let thing = this.thing
+                    bus.$emit('add', thing) 
+                    this.thing=''
+                }
+            }
+        }
+
+        // 正在进行的数量显示组件，作为doing的子组件需要注册在doing组件中，因而先于doing定义
+        const DoingCount ={
+            template:`<span id='doing_num'>{{ num1 }}</span>`,
+            data(){
+                return{  
+                }
+            },
+            props:[ 'num1' ]   
+        }
+        // 正在进行的组件
+        const Doing = {
+            template:"#doing",
+            data(){
+                return{
+                    willDo:[],
+                    num: 0,
+                }
+            },
+            components:{ DoingCount },
+            methods:{
+                remove(index){
+                    // 获得本行的index值，然后根据index找到对应的内容，
+                    // 传递给已经完成的，并且将数组中的词条记录删除
+                    // console.log(this.willDo[index])
+                    // console.log(this)
+                    // 点击完成，将对应的词语传递给已经完成
+                    bus.$emit('remove',this.willDo[index])
+                    this.willDo.splice(index, 1)
+                    this.num = this.willDo.length
+                },
+                del(index){
+                    this.willDo.splice(index, 1)
+                    this.num = this.willDo.length
+                }
+            },
+            mounted(){
+                bus.$on('add',value=>{
+                    this.willDo.push(value)
+                    this.num = this.willDo.length
+                })
+                //如果localStorage中有数据则执行，获得数据，根据数据渲染
+                if(localStorage.getItem('lists')){
+                    let arr = JSON.parse( localStorage.getItem('lists') )
+                    this.num =arr[0]
+                    this.willDo = arr[1]                    
+                }
+                //console.log( localStorage.getItem('lists') ) 
+            },
+            updated(){
+                let arr = []
+                arr.push(this.num) 
+                arr.push( this.willDo )
+                // console.log( arr )
+                localStorage.setItem('lists', JSON.stringify( arr ))
+            }
+        }
+
+        // 定义一个子组件，来显示已经完成的数量，
+        // 子组件接受从 父组件（已经完成里边的doneList长度值），起初是0
+        const EndCount = {
+            data:()=>({
+                
+            }),
+            template:`<span id='end_num'>{{ num2 }}</span>`,
+            props:['num2']
+        }
+
+
+        // 已经完成
+        const Ended={
+            data:()=>({
+                doneList:[],
+                num:0,
+            }),
+            template:'#ended',
+            components:{ EndCount },
+            methods:{
+                del(index){
+                    this.doneList.splice(index,1)
+                    this.num = this.doneList.length
+                }
+            },
+            mounted(){
+                bus.$on('remove',value=>{
+                    this.doneList.push(value)
+                    this.num=this.doneList.length
+                })
+                //如果localStorage中有数据则执行，获得数据，根据数据渲染
+                if(localStorage.getItem('donelists')){
+                    let arr = JSON.parse( localStorage.getItem('donelists') )
+                    this.num =arr[0]
+                    this.doneList = arr[1]                    
+                }
+            },
+            updated(){
+                let arr = []
+                arr.push(this.num) 
+                arr.push( this.doneList )
+                // console.log( arr )
+                localStorage.setItem('donelists', JSON.stringify( arr ))
+            },
+            beforeDestroy(){
+                console.log('北京欢迎你')
+                // localStorage.setItem('aaaa', JSON.stringify( '89898989' ))
+            }
+        }
+
+
+        new Vue({
+            el:'#root',
+            data:{
+
+            },
+            components:{ Top, Doing ,Ended},
+        })
+        // 最后保存功能的实现
+        // 将数据保存到localStorage中，然后每次打开，
+        // 先查看localstorage，如果有数据则传递过去。没有的话按照初始状态
+        // 保存数据涉及到正在进行还有已经完成的数据
+        // 分步实现，搞定保存正在进行的数据
+
+        // 思路：1，生命周期函数，在destroybefore时将数据写入到localStorage中
+        //         遇到问题，就是在 beforeDestroy
+
+    </script>
+</body>
+</html>
