@@ -1,0 +1,100 @@
+
+html,body,h1,input,ol,ul,li,p{
+    margin: 0;
+    padding: 0;
+}
+ol,ul,li{
+    list-style-type: none;
+    
+}
+body{
+    background: #cdcdcd;
+}
+#topArea{
+    background: #000;
+}
+header,.main-con{
+    margin: 0 auto;
+    width: 600px;
+}
+header{
+    font-size: 20px;
+    height: 40px;
+    line-height: 40px;
+    color: #ffffff;
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+}
+header input{
+    height: 30px;
+    width:360px;
+    line-height: 40px;
+    outline: none;
+    border-radius: 8px;
+    padding-left: 10px;
+}
+li{
+    background:skyblue; 
+    position: relative;
+    margin-top:4px;
+}
+li p{
+    height: 30px;
+    line-height: 30px;
+    background: #fff;
+    margin-left: 4px;
+    padding-left: 8px;
+    padding-right: 90px;
+    /* float: left; */
+}
+.doing ol li button:nth-of-type(1){
+    position: absolute;
+    right:50px;
+    top: 5px;
+}
+.doing ol li button:nth-of-type(2){
+    position: absolute;
+    right:0px;
+    top: 5px;
+}
+.finished ul li button:nth-of-type(1){
+    position: absolute;
+    right:50px;
+    top: 5px;
+}
+.finished ul li button:nth-of-type(2){
+    position: absolute;
+    right:0px;
+    top: 5px;
+}
+
+/* 
+.finished ul li button{
+    position: absolute;
+    right:0px;
+    top: 5px;
+} */
+.doing>h2,.finished>h2{
+    position: relative;
+}
+#doing_num,#end_num{
+    position: absolute;
+    width: 20px ;
+    height: 20px;
+    border-radius: 8px;
+    background: #fff;
+    right: 0px;
+    top: 6px;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+}
+/* .clear_fix:after{
+    content: '';
+    clear: both;
+    height: 0;
+    display: none;
+    visibility: hidden;
+    overflow:hidden;
+} */
